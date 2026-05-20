@@ -87,6 +87,21 @@ During a campaign, each user-visible update should include:
 
 Before ending a session or after compaction risk, update `session-memory` `handoff.md` with: objective, stop rules, prefix, last TSV index, best `keep` branch, and path to the latest `run.log`.
 
+## Azure AI Foundry (gpt-5.3-codex)
+
+Codex deployments on Foundry project `/openai/v1` are **Responses-only** and reject OpenClaw's default `input[]` shape unless each item has `type: "message"`.
+
+Use the input-wrapping proxy in this skill:
+
+```bash
+export AZURE_FOUNDRY_TARGET_BASE_URL='https://<resource>.services.ai.azure.com/api/projects/<project>/openai/v1'
+node "$(git rev-parse --show-toplevel)/skills/auto-research-openclaw/scripts/azure-foundry-responses-proxy.js"
+```
+
+Set OpenClaw `models.providers.*.baseUrl` to `http://127.0.0.1:2929`, `api` to `openai-responses`, and forward the Foundry key via `headers.api-key`.
+
+Full steps: `{skill}/references/azure-foundry-openclaw.md`.
+
 ## When to leave OpenClaw local mode
 
 If the user asks for Kubernetes, Slurm, or Brev:

@@ -102,6 +102,7 @@ If the user gives no stopping conditions, run baseline plus up to three low-risk
 ## References
 
 - `{baseDir}/references/openclaw-environment.md` — local host, workspace, caches, background runs
+- `{baseDir}/references/azure-foundry-openclaw.md` — Foundry gpt-5.3-codex proxy + OpenClaw config
 - `{baseDir}/references/git-workflow.md` — branches, baseline, dirty worktree
 - `{baseDir}/references/exploration-ideas.md` — hypotheses by symptom
 - `{baseDir}/references/experiment-log-template.md` — TSV schema

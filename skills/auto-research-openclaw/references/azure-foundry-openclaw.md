@@ -39,6 +39,15 @@ Copy `azure-foundry-proxy.env.example` to a local env file if you prefer; do not
 
 ### 2. Point OpenClaw at the proxy
 
+**Important:** `baseUrl` must be only the proxy root — **not** `/openai/v1`:
+
+| Setting | Correct | Wrong |
+|---------|---------|-------|
+| `AZURE_FOUNDRY_TARGET_BASE_URL` | `.../openai/v1` | `.../openai/v1/responses` |
+| OpenClaw `baseUrl` | `http://127.0.0.1:2929` | `http://127.0.0.1:2929/openai/v1` |
+
+OpenClaw appends `/responses` itself. A double path (`.../v1/responses/responses` or `.../v1/v1/responses`) yields **404** or **unsupported operation**.
+
 In `~/.openclaw/openclaw.json`:
 
 ```json
@@ -83,6 +92,26 @@ Set agent model when testing:
 # Proxy + Foundry (via proxy) — after proxy is running
 openclaw agent --local --agent main --session-id "$(uuidgen)" \
   --model azure_openai_response/gpt-5.3-codex --message "hi"
+```
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `404 status code (no body)` | Target URL had trailing `/responses`, or OpenClaw `baseUrl` includes `/openai/v1` |
+| `400 The requested operation is unsupported` | Often wrong path (above) or Foundry rejecting `tools[]`; test with `AZURE_FOUNDRY_PROXY_STRIP_TOOLS=1` and/or `tools.profile: "coding"` |
+| `400 Invalid value: ''` on `input[n]` | Proxy not running or not transforming body; restart proxy |
+
+Verbose upstream errors:
+
+```bash
+AZURE_FOUNDRY_PROXY_VERBOSE=1 node azure-foundry-responses-proxy.js
+```
+
+Test without client tools (isolates tool schema issues):
+
+```bash
+AZURE_FOUNDRY_PROXY_STRIP_TOOLS=1 node azure-foundry-responses-proxy.js
 ```
 
 Self-test wrapping logic (no network):
