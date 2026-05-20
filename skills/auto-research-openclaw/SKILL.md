@@ -8,15 +8,27 @@ metadata: {"openclaw":{"emoji":"🔬","requires":{"bins":["uv","git"]}}}
 
 Run iterative NeMo-RL experiments in the **NeMo-RL repository checkout** on the **local OpenClaw machine** against the user's stated objective (accuracy, reward, throughput, latency, stability, or another recipe-specific metric). Use **git branches** and an **untracked TSV ledger** as the research journal.
 
-This skill inherits the experiment loop, branching rules, stop conditions, and hypothesis priorities from `auto-research`, but **defaults to local execution only**. Do not use `brev-etiquette`, `launch-nemo-rl`, or remote schedulers unless the user explicitly asks to move off the OpenClaw host.
+This skill inherits the experiment loop, branching rules, stop conditions, and hypothesis priorities from `{baseDir}/../auto-research/SKILL.md`, but **defaults to local execution only**. Do not use `brev-etiquette`, `launch-nemo-rl`, or remote schedulers unless the user explicitly asks to move off the OpenClaw host.
 
 Treat dependencies as ready. Use the recipe's authoritative metric as the source of truth. Keep changes small, reproducible, and simple. Preserve unrelated user work.
 
+## Layout
+
+- **Skill path (in repo):** `skills/auto-research-openclaw/` — `{baseDir}` when loaded from the NeMo-RL checkout.
+- **NeMo-RL repo root:** The git top-level for training and campaigns (commonly `~/Dev/NemoRL/RL`). Recipe paths (`examples/...`), `reports/auto_research/`, and `uv run` are always relative to this root.
+- **OpenClaw agent workspace:** May differ (e.g. `~/.openclaw/workspace` or a parent `Dev` folder). Still execute git, `uv`, and logging in the NeMo-RL repo the user names or attaches — not in a parent directory.
+
+Sibling skills in the same tree: `auto-research`, `session-memory`, `launch-nemo-rl`, `brev-etiquette`.
+
 ## OpenClaw setup
 
-1. **Repository root** — Run all commands from the NeMo-RL clone (the workspace or cwd the user attached). Confirm with `git rev-parse --show-toplevel` before branching.
-2. **Skills** — Load this skill from the repo (`skills/auto-research-openclaw/`) via `skills.load.extraDirs`, copy into `<workspace>/skills/`, or symlink. After adding or editing the skill, start a new OpenClaw session (`/new`) or restart the gateway so it appears in `openclaw skills list`.
-3. **Companion skill** — Use `session-memory` for every campaign (same checkpoints as `auto-research`).
+1. **NeMo-RL repo root** — `cd` to the user's NeMo-RL clone (e.g. `~/Dev/NemoRL/RL`). Confirm with `git rev-parse --show-toplevel` before branching. Do not use parent folders (`NemoRL`, `Dev`) as the repo.
+2. **Skills** — Install from `<repo>/skills/`:
+   - **extraDirs** — Add `<repo>/skills` to `skills.load.extraDirs` in `openclaw.json` (loads this skill and siblings).
+   - **Workspace copy** — `cp -R "$(git rev-parse --show-toplevel)/skills/auto-research-openclaw" ~/.openclaw/workspace/skills/`
+   - **Symlink** — Link `<repo>/skills/auto-research-openclaw` into the agent workspace `skills/` directory.
+   After adding or editing the skill, start a new OpenClaw session (`/new`) or restart the gateway; verify with `openclaw skills list | grep auto-research-openclaw`.
+3. **Companion skills** — Use `session-memory` for every campaign (`{baseDir}/../session-memory/SKILL.md`; same checkpoints as `auto-research`).
 4. **Execution** — Launch training with `exec` / bash on the **host** (not a sandbox) when GPUs are on the same machine as OpenClaw. For runs longer than one turn, use background mode and poll logs under `reports/auto_research/`.
 5. **Secrets** — Load API keys from the user's shell environment or repo-local `.env` if present. Never print, log, or commit secret values. Do not assume Brev paths (`/home/ubuntu/RL`, `/ephemeral`).
 
@@ -34,9 +46,9 @@ See `{baseDir}/references/openclaw-environment.md` for paths, caches, long-runni
 
 **Runtime choice (OpenClaw default):** Run **locally** with `uv run` when the host has suitable GPUs. Use CPU-only local runs for light inspection, dry runs, and short non-GPU checks. If the user asks for Kubernetes or Slurm, stop and load `launch-nemo-rl` or the environment's native launcher instead of improvising cluster commands.
 
-Use `session-memory` before branching; checkpoint after forming the plan, before and after meaningful edits or long-running launches, on direction changes, and before handoff or final summary.
+Use `{baseDir}/../session-memory/SKILL.md` before branching; checkpoint after forming the plan, before and after meaningful edits or long-running launches, on direction changes, and before handoff or final summary.
 
-After context compaction, handoff, disconnect, or a long gap, reload this skill and `session-memory`, read the latest handoff, and restate objective, stop rules, current branch, and latest result. Treat follow-up steering as additive unless the user explicitly changes the main objective.
+After context compaction, handoff, disconnect, or a long gap, reload this skill and `session-memory`, `cd` to the NeMo-RL repo root, read the latest handoff, and restate objective, stop rules, current branch, and latest result. Treat follow-up steering as additive unless the user explicitly changes the main objective.
 
 ## Branching
 
@@ -74,7 +86,7 @@ Count-based stops count **attempted** experiments, not only successes. Campaign 
 
 ## Priorities
 
-Same as `auto-research` — prefer high expected gain and low complexity:
+Same as `{baseDir}/../auto-research/SKILL.md` — prefer high expected gain and low complexity:
 
 - correctness and backend compatibility
 - prompt and rollout formatting
@@ -88,7 +100,7 @@ See `{baseDir}/references/exploration-ideas.md` for symptom → hypothesis mappi
 
 ## Avoid
 
-- Do not route through Brev, `brev-etiquette`, or `/ephemeral` layout unless the user explicitly moves to Brev (then use `auto-research` + `brev-etiquette` instead).
+- Do not route through Brev, `brev-etiquette`, or `/ephemeral` layout unless the user explicitly moves to Brev (then use `{baseDir}/../auto-research/SKILL.md` + `brev-etiquette` instead).
 - Do not default to `launch-nemo-rl`, Slurm batch queues, or remote clusters on OpenClaw.
 - Do not mark a training hypothesis `discard` from an underpowered smoke run.
 - Do not let compaction or follow-up questions erase the campaign goal — refresh `session-memory` first.
