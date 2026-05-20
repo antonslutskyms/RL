@@ -1,0 +1,13 @@
+Use auto-research-openclaw + session-memory in ~/Dev/NemoRL/RL.
+
+GPU local campaign:
+
+Prefix: autoresearch/openclaw-gpu-test-2026-05-20 (continue if baseline exists, else create it)
+Recipe: examples/configs/recipes/llm/grpo-qwen2.5-math-1.5b-instruct-1n4g-fsdp2tp1.v3.yaml
+cluster: match my GPU count (1 GPU → gpus_per_node=1 num_nodes=1; 4 GPUs → use recipe as-is)
+Stop after 2 attempted experiments total (baseline + one hypothesis), or 2 hours campaign budget, whichever comes first
+Per-run timeout: 60 minutes
+Hypothesis for experiment 2 (branch autoresearch/openclaw-gpu-test-2026-05-20/bf16-if-fp16):
+
+If recipe uses fp16, try bf16 for policy precision only; smallest config diff; one commit; local uv run; log to reports/auto_research/openclaw-gpu-test-2026-05-20/bf16-if-fp16/
+Report stop condition after each run. Mark keep/discard/crash in TSV. Update session-memory handoff when done.

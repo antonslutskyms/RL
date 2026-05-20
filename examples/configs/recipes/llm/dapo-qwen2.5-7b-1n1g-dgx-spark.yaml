@@ -1,0 +1,60 @@
+# DAPO Qwen2.5-Math-7B on a single DGX Spark node (1× GB10).
+# Inherits algorithm and data settings from dapo-qwen2.5-7b.yaml; scales parallelism
+# and batching for one GPU. Set TORCH_CUDA_ARCH_LIST for Blackwell before launch
+# (for example export TORCH_CUDA_ARCH_LIST='10.0 12.0').
+defaults: ./dapo-qwen2.5-7b.yaml
+grpo:
+  num_prompts_per_step: 8
+  num_generations_per_prompt: 8
+  batch_multiplier: 1
+  max_val_samples: 64
+  val_batch_size: 64
+  reward_shaping:
+    overlong_buffer_length: 1024
+    max_response_length: 6144
+checkpointing:
+  checkpoint_dir: results/dapo-qwen2.5-7b-1n1g-dgx-spark
+policy:
+  train_global_batch_size: 64
+  train_micro_batch_size: 1
+  logprob_batch_size: 1
+  max_total_sequence_length: 8192
+  dynamic_batching:
+    enabled: true
+  hf_config_overrides:
+    max_position_embeddings: 8192
+  offload_optimizer_for_logprob: true
+  dtensor_cfg:
+    _v2: true
+    enabled: true
+    tensor_parallel_size: 1
+    context_parallel_size: 1
+    activation_checkpointing: true
+  megatron_cfg:
+    enabled: false
+    tensor_model_parallel_size: 1
+    pipeline_model_parallel_size: 1
+    context_parallel_size: 1
+    sequence_parallel: false
+  make_sequence_length_divisible_by: 2
+  generation:
+    max_new_tokens: 8192
+    vllm_cfg:
+      tensor_parallel_size: 1
+      gpu_memory_utilization: 0.45
+      max_model_len: 8192
+data:
+  max_input_seq_length: 2048
+env:
+  math:
+    num_workers: 4
+logger:
+  log_dir: logs/dapo-qwen2.5-7b-1n1g-dgx-spark
+  monitor_gpus: true
+  wandb:
+    name: dapo-qwen2.5-7b-1n1g-dgx-spark
+  mlflow:
+    run_name: dapo-qwen2.5-7b-1n1g-dgx-spark
+cluster:
+  gpus_per_node: 1
+  num_nodes: 1

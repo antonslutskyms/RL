@@ -1,0 +1,36 @@
+Use auto-research-openclaw + session-memory in ~/Dev/NemoRL/RL.
+
+Env is fixed on spark-1198: submodules + uv sync verified. Do NOT reuse the
+completed 2/2 stop from openclaw-gpu-test-2026-05-20.
+
+Prefix: autoresearch/openclaw-gpu-test-2026-05-20-wave2
+Recipe: examples/configs/recipes/llm/grpo-qwen2.5-math-1.5b-instruct-1n4g-fsdp2tp1.v3.yaml
+cluster: 1 GPU → cluster.gpus_per_node=1 cluster.num_nodes=1
+Stop: 2 attempted experiments OR 2h campaign budget (from new CAMPAIGN_START).
+Per-run timeout: 60 minutes.
+
+Preflight (must pass before first training launch):
+  cd ~/Dev/NemoRL/RL
+  git submodule update --init --recursive
+  test -f 3rdparty/Gym-workspace/Gym/pyproject.toml
+  uv sync --locked
+  uv run python -c "import nemo_rl; print('ok')"
+
+Launch pattern (every experiment):
+  LOG_DIR=reports/auto_research/openclaw-gpu-test-2026-05-20-wave2/<name>
+  mkdir -p "$LOG_DIR"
+  timeout 3600s uv run ./examples/run_grpo.py \
+    --config examples/configs/recipes/llm/grpo-qwen2.5-math-1.5b-instruct-1n4g-fsdp2tp1.v3.yaml \
+    cluster.gpus_per_node=1 cluster.num_nodes=1 \
+    logger.log_dir="$LOG_DIR/metrics" \
+    logger.wandb_enabled=false \
+    logger.tensorboard_enabled=false \
+    > "$LOG_DIR/run.log" 2>&1
+  Never redirect stdout to logs/<recipe-name> (that creates a file, not a dir).
+
+Exp 1: branch .../baseline-rerun — no config commit unless needed.
+Exp 2: one commit — reduce memory for 1 GPU (e.g. policy.train_micro_batch_size=1,
+       grpo.num_prompts_per_step=8). Skip bf16 (already bfloat16).
+
+TSV: reports/auto_research/openclaw-gpu-test-2026-05-20-wave2/experiments.tsv
+Report stop condition after each run.
