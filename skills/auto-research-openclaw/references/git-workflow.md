@@ -7,23 +7,23 @@ Use git as a durable experiment journal.
 Use one shared prefix for the whole campaign.
 
 Examples:
-- `autoresearch/2026-03-24-dapo-qwen2p5`
-- `autoresearch/2026-03-24-dapo-qwen2p5-gpu0`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark-gpu0`
 
 ## Branch Layout
 
 Use one branch per experiment under the shared prefix.
 
 Examples:
-- `autoresearch/2026-03-24-dapo-qwen2p5/baseline`
-- `autoresearch/2026-03-24-dapo-qwen2p5/prompt-compact-schema`
-- `autoresearch/2026-03-24-dapo-qwen2p5/bf16-retune-batch`
-- `autoresearch/2026-03-24-dapo-qwen2p5/async-actor-learner-split`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/baseline`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/prompt-compact-schema`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/bf16-retune-batch`
+- `autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/async-actor-learner-split`
 
 Create each branch from a deliberate parent commit:
 
 ```bash
-git checkout -b autoresearch/2026-03-24-dapo-qwen2p5/prompt-compact-schema <base-commit>
+git checkout -b autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/prompt-compact-schema <base-commit>
 ```
 
 Prefer targeted staging and one hypothesis-focused commit before the run:
@@ -80,7 +80,7 @@ Before changing branches, inspect the worktree and distinguish user work from ex
 If no baseline exists for the shared prefix, create one first:
 
 ```bash
-git checkout -b autoresearch/2026-03-24-dapo-qwen2p5/baseline <base-commit>
+git checkout -b autoresearch/2026-03-24-dapo-qwen2p5-7b-1n1g-dgx-spark/baseline <base-commit>
 git commit -s --allow-empty -m "baseline: record starting point"
 ```
 

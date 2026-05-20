@@ -37,7 +37,7 @@ See `{baseDir}/references/openclaw-environment.md` for paths, caches, long-runni
 ## Workflow
 
 1. Inspect git state and identify unrelated user changes before branching.
-2. Use a shared branch prefix. Prefer a user-provided one; otherwise default to `autoresearch/<date>-<recipe-slug>` (e.g. `autoresearch/2026-05-20-dapo-qwen2p5`).
+2. Use a shared branch prefix. Prefer a user-provided one; otherwise default to `autoresearch/<date>-<recipe-slug>` (e.g. `autoresearch/2026-05-20-dapo-qwen2p5-7b-1n1g-dgx-spark` with recipe `examples/configs/recipes/llm/dapo-qwen2.5-7b-1n1g-dgx-spark.yaml`).
 3. Read the target recipe, its parents, and relevant code in `examples/run_grpo.py`, `nemo_rl/models/`, `nemo_rl/algorithms/`, `nemo_rl/environments/`, and `docs/`. For NeMo-gym recipes, also inspect `examples/nemo_gym/`.
 4. Translate user stop rules into monitorable values: `target_experiment_count`, `campaign_deadline`, `per_experiment_timeout`, `target_metric`.
 5. Verify data, checkpoints, runtime inputs, and that **local GPUs** are visible (`nvidia-smi` when applicable).
@@ -61,7 +61,7 @@ See `{baseDir}/references/git-workflow.md`.
 ## Loop
 
 1. Pick one concrete hypothesis.
-2. Create a branch such as `autoresearch/2026-05-20-dapo-qwen2p5/prompt-compact-schema`.
+2. Create a branch such as `autoresearch/2026-05-20-dapo-qwen2p5-7b-1n1g-dgx-spark/prompt-compact-schema`.
 3. Edit the smallest set of files needed.
 4. Commit the hypothesis.
 5. Before launch, check monitored stop conditions.
